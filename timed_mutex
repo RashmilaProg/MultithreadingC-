@@ -7,6 +7,9 @@ Code, Compile, Run and Debug online from anywhere in world.
 
 *******************************************************************************/
 #include <iostream>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 // In this video we will learn about "Timed Mutex In C++ Threading (std::timed_mutex)"
 // We have learned Mutex, Race Condition, Critical Section in previous videos.
@@ -26,9 +29,35 @@ Code, Compile, Run and Debug online from anywhere in world.
 
 
 //watch video again
+
+int amountMoney = 0;
+timed_mutex m;
+void addMoney(int threadID)
+{
+    if(m.try_lock_for(chrono::seconds(1)))
+    {
+        amountMoney++;
+        this_thread::sleep_for(chrono::seconds(2));
+        m.unlock();
+        cout<<"Entered for thread "<<threadID<<endl;
+    }
+    else{
+        cout<<"Could not Enter for thread "<<threadID<<endl;
+    }
+    
+}
+
 int main()
 {
-    std::cout<<"Hello World";
+    thread th1(addMoney, 1);
+    thread th2(addMoney, 2);
+    
+    th1.join();
+    th2.join();
 
     return 0;
 }
+
+output:
+Could not Enter for thread 2
+Entered for thread 1
