@@ -1,0 +1,49 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, OCaml, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <iostream>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// In this video we will learn about Mutex In C++ Threading | Why Use Mutex | What Is Race Condition And How To Solve It? | What Is Critical Section
+
+// Mutex: Mutual Exclusion
+
+// RACE CONDITION:
+// 0. Race condition is a situation where two or more threads/process happens to change a common data at the same time.
+// 1. If there is a race condition then we have to protect it and the protected section is  called critical section/region.
+
+// MUTEX:
+// 0. Mutex is used to avoid race condition.
+// 1. We use lock() , unlock() on mutex to avoid race condition.
+
+int amountMoney = 0;
+std::mutex m;
+
+void updateMoney()
+{
+    m.lock();
+    amountMoney++;
+    m.unlock();
+}
+
+int main()
+{
+    std::cout<<"Hello World"<<endl;
+    
+    std::thread th1(updateMoney);
+    std::thread th2(updateMoney);
+    
+    th1.join();
+    th2.join();
+    
+    cout<<"Money"<<amountMoney<<endl;
+
+    return 0;
+}
