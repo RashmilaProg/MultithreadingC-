@@ -1,4 +1,5 @@
 https://www.geeksforgeeks.org/cpp/std-thread-join-in-cpp/
+https://www.geeksforgeeks.org/cpp/how-to-detach-a-thread-in-cpp/
 
 /******************************************************************************
 
@@ -53,3 +54,4 @@ int main()
     return 0;
 
 }
+
