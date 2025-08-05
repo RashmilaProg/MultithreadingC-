@@ -1,0 +1,67 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+  GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
+  C#, OCaml, VB, Perl, Swift, Prolog, Javascript, Pascal, COBOL, HTML, CSS, JS
+  Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <stdio.h>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// In this video we will learn how to use "Condition Variable In C++ Threading".
+// Few important points to remember while using "condition variables" are as follows:
+// 1. Condition variables allow us to synchronise threads via notifications.
+//   a. notify_one();
+//   b. notify_all();
+// 2. You need mutex to use condition variable
+// 3. Condition variable is used to synchronise two or more threads.
+// 4. Best use case of condition variable is Producer/Consumer problem.
+// 5. Condition variables can be used for two purposes:
+//     a. Notify other threads
+//     b. Wait for some condition
+
+int balance = 0;
+std::mutex m;
+condition_variable cv;
+
+void addMoney(int money)
+{
+    std::lock_guard<mutex> lock(m);
+    balance = balance + money;
+    cout<<"After adding current balance is"<<balance;
+    cv.notify_one();
+}
+
+void withdrawMoney(int money)
+{
+    std::unique_lock<mutex> lock(m);
+    cv.wait(lock, [] {return (balance!=0) ? true: false;});
+    
+    if(balance>=money)
+    {
+        balance = balance - money;
+        cout<<"Balance after withdrawMoney is"<<balance<<endl;
+    }
+    else
+    {
+        cout<<"Current balance is less "<<endl;
+    }
+}
+
+
+
+int main()
+{
+    printf("Hello World");
+    
+    thread th1(withdrawMoney, 500);
+    thread th2(addMoney, 500);
+    
+    th1.join();
+    th2.join();
+
+    return 0;
+}
