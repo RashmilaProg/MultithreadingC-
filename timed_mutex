@@ -34,7 +34,9 @@ int amountMoney = 0;
 timed_mutex m;
 void addMoney(int threadID)
 {
-    if(m.try_lock_for(chrono::seconds(1)))
+    auto now = chrono::steady_clock::now();
+    if(m.try_lock_until(now + chrono::seconds(1)))
+    // if(m.try_lock_for(chrono::seconds(1)))
     {
         amountMoney++;
         this_thread::sleep_for(chrono::seconds(2));
