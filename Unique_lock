@@ -33,8 +33,8 @@ std::mutex m;
 
 void updateBuffer(int threadId, int loopCount)
 {
-    //std::unique_lock<mutex> lock(m);
-    std::unique_lock<mutex> lock(m, defer_lock);
+    //std::unique_lock<mutex> lock(m); //mutex will be locked immediately
+    std::unique_lock<mutex> lock(m, defer_lock); //mutex will not be locked immediately, mutex can be locked later on in the program
     
     lock.lock();
     for(int i =0; i< loopCount; i++)
