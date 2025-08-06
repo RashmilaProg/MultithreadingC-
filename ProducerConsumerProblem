@@ -1,0 +1,81 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+  GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
+  C#, OCaml, VB, Perl, Swift, Prolog, Javascript, Pascal, COBOL, HTML, CSS, JS
+  Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <stdio.h>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// THE PROBLEM STATEMENT:
+//  1. Producer will produce and consumer will consume with synchronisation of a common buffer.
+//  2. Until producer thread produces any data consumer thread can't consume.
+//  3. Threads will use condition_variable to notify each other.
+//  4. We need mutex if we use condition_variable because CV waits on mutex.
+//  5. This is one of the example of producer consumer there are many.
+
+// PRODUCER thread steps:
+//  1. lock mutex, if success then go ahead otherwise wait for mutex to get free.
+//  2. check if buffer is full and if it is full then unlock mutex and sleep, if not then go ahead and produce.
+//  3. insert item in buffer.
+//  4. unlock mutex. 
+//  5. notify consumer.
+
+// CONSUMER thread steps:
+//  1. lock mutex, if success then go ahead otherwise wait for mutex to get free.
+//  2. check if buffer is empty and if it is, then unlock the mutex and sleep, if not then go ahead and consume.
+//  3. consume item from buffer.
+//  4. unlock mutex.
+//  5. notify producer.
+
+// IMP:
+//  Producer and Consumer have to notify each other upon completion of their job.
+
+mutex m;
+int bufferSize = 50;
+deque<int> buffer;
+condition_variable cv;
+void producer(int val)
+{
+    while(val)
+    {
+        std::unique_lock<mutex> lock(m);
+        cv.wait(lock, [](){return buffer.size()<bufferSize;});
+        buffer.push_back(val);
+        cout<<"producer produced "<<val<<endl;
+        val--;
+        lock.unlock();
+        cv.notify_one();
+        
+    }
+}
+
+void consumer()
+{
+    while(true)
+    {
+         std::unique_lock<mutex> lock(m);
+        cv.wait(lock, [](){return !buffer.empty();});
+        int poppedVal = buffer.back();
+        buffer.pop_back();
+        cout<<"Consumer consumed "<<poppedVal<<endl;
+        lock.unlock();
+        cv.notify_one();
+    }
+}
+int main()
+{
+    
+    thread th1(producer, 50);
+    thread th2(consumer);
+    
+    th1.join();
+    th2.join();
+    
+
+    return 0;
+}
