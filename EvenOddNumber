@@ -1,0 +1,80 @@
+Printing even and odd numbers using multithreading in C++ typically involves creating two threads: one for printing even numbers and another for printing odd numbers. Synchronization mechanisms like mutexes and condition variables are essential to ensure the numbers are printed in an alternating or ordered fashion. 
+Here is a common approach using std::mutex and std::condition_variable from the C++ Standard Library: 
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+std::mutex mtx;
+std::condition_variable cv;
+int currentNumber = 1;
+int maxNumber = 20; // Or any desired limit
+bool isOddTurn = true; // Flag to control which thread's turn it is
+
+void printOddNumbers() {
+    while (currentNumber <= maxNumber) {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [] { return isOddTurn; }); // Wait if it's not odd's turn
+
+        if (currentNumber > maxNumber) break; // Check again after waking up
+
+        if (currentNumber % 2 != 0) {
+            std::cout << "Odd: " << currentNumber << std::endl;
+            currentNumber++;
+            isOddTurn = false; // Set turn to even
+            cv.notify_one(); // Notify the even thread
+        } else {
+            // If currentNumber became even unexpectedly (e.g., another thread printed), release lock and wait again
+            isOddTurn = false;
+            cv.notify_one();
+        }
+    }
+}
+
+void printEvenNumbers() {
+    while (currentNumber <= maxNumber) {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [] { return !isOddTurn; }); // Wait if it's not even's turn
+
+        if (currentNumber > maxNumber) break; // Check again after waking up
+
+        if (currentNumber % 2 == 0) {
+            std::cout << "Even: " << currentNumber << std::endl;
+            currentNumber++;
+            isOddTurn = true; // Set turn to odd
+            cv.notify_one(); // Notify the odd thread
+        } else {
+            // If currentNumber became odd unexpectedly, release lock and wait again
+            isOddTurn = true;
+            cv.notify_one();
+        }
+    }
+}
+
+int main() {
+    std::thread oddThread(printOddNumbers);
+    std::thread evenThread(printEvenNumbers);
+
+    oddThread.join();
+    evenThread.join();
+
+    return 0;
+}
+
+Explanation: 
+
+• std::mutex mtx;: Protects currentNumber and isOddTurn from concurrent access. 
+• std::condition_variable cv;: Allows threads to wait for a specific condition to be met and to be notified when that condition changes. 
+• currentNumber: Shared variable holding the number to be printed. 
+• isOddTurn: A boolean flag indicating whose turn it is to print (true for odd, false for even). 
+• printOddNumbers() and printEvenNumbers() functions: 
+	• Each function acquires a std::unique_lock on the mutex. 
+	• cv.wait(lock, predicate): The thread waits if the predicate (lambda function) is false, releasing the lock. When notified, it reacquires the lock and re-evaluates the predicate. 
+	• After printing, the currentNumber is incremented, the isOddTurn flag is toggled, and cv.notify_one() is called to wake up the other waiting thread. 
+
+• main() function: 
+	• Creates two std::thread objects, each running one of the printing functions. 
+	• join() is called on both threads to ensure the main thread waits for them to complete before exiting. 
+
+AI responses may include mistakes.
+
