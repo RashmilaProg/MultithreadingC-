@@ -1,0 +1,53 @@
+Youtube Video Link: https://youtu.be/XDZkyQVsbDY?si=alSXASiAlCJVXD1M
+/******************************************************************************
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, OCaml, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <iostream>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// In this video we will learn about how std::promise and std::future and how they work together to synchronise threads.
+// Basically std::promise is sent to the called thread and once the value is ready we set that value in promise object, 
+//now at calling thread side we get that value using std::future object which was created using std::promise object before sending it to the called thread. 
+// And this is how we receive value from one thread to another in synchronisation.
+
+void calculateOddSum(promise<int> && promiseObj, int start, int end)
+{
+    int oddSum = 0;;
+    for(int i = start; i<end; i++)
+    {
+        if(i % 2 !=0)
+        {
+            oddSum = oddSum + i;
+        }
+    }
+    
+    promiseObj.set_value(oddSum);
+}
+
+
+
+int main()
+{
+    std::cout<<"Hello World";
+    
+    int start = 0; 
+    int end = 10000;
+    
+    promise<int> promiseObj;
+    future<int> futureObj = promiseObj.get_future();
+    
+    thread th1(calculateOddSum, std::move(promiseObj), start, end);
+    
+    cout<<"result "<<futureObj.get();
+    
+    th1.join();
+
+    return 0;
+}
