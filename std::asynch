@@ -1,0 +1,62 @@
+Youtube video link: https://youtu.be/eTMY5zXits8?si=A_X1fj6EFwZQFcca
+/******************************************************************************
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, OCaml, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <iostream>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+//It runs a function asynchronously(potentially in a new thread) and return a std:;future
+//that will hold the result.
+
+// Here we will learn std::async and its usage like how to create task. 
+// There are three different launch policy for creating task using std::async are as follows:
+// 1. std::launch::async
+// 2. std::launch::deffered
+// 3. std::launch::async | std::launch::deffered
+
+//HOW IT WORKS
+//1. It automatically creates a thread (or picks from internal thread pool) and a promise object for us
+//2. then passes the std:;promise object to thread function and returns teh associated std:;future object
+//3. When our passed argument function exits then its value will be set in this promise object
+// so eventually return value will be available in std::future object
+
+//SIDE NOTES:
+//1. We can send functor and lambda function as callback to std::asynch. It will work the same.
+
+// With the help of above policies std::async decides to create task as asynchronous 
+// or synchronous. Please go through video for more details.
+
+long oddSum(long start, long end)
+{
+    long oddSumVal = 0;
+    for(int i = start; i<=end; i++)
+    {
+        if(i%2 !=0)
+        {
+            oddSumVal = oddSumVal + i;
+        }
+    }
+    cout<<"oddSumVal"<<oddSumVal<<endl;
+    return oddSumVal;
+    
+}
+
+int main()
+{
+    std::cout<<"Hello World";
+    long start = 0;
+    long end = 100000;
+    
+    std::future<long> oddSumVal = std::async(std::launch::deferred, oddSum, start, end);
+    
+    cout<<"OddSum = "<<oddSumVal.get();
+
+    return 0;
+}
