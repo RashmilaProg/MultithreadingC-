@@ -23,7 +23,7 @@ using namespace std;
 
 //HOW IT WORKS
 //1. It automatically creates a thread (or picks from internal thread pool) and a promise object for us
-//2. then passes the std:;promise object to thread function and returns teh associated std:;future object
+//2. then passes the std:;promise object to thread function and returns the associated std:;future object
 //3. When our passed argument function exits then its value will be set in this promise object
 // so eventually return value will be available in std::future object
 
